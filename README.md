@@ -4,7 +4,7 @@
 
 Utility to close a specified process once it reaches the specified lifespan (in minutes).
 
-#### How to use the script in a powershell window
+#### How to use the script
 
 ```bash
 ./QA_Task <process_name> <lifespan_in_minutes> <recheck_frequency>
