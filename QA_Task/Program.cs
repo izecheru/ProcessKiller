@@ -67,9 +67,9 @@ namespace QA_Task
                             Process[] targets = Process.GetProcessesByName(targetProc);
 
                             // print found processes 
-                            MyProcessHelper.PrintProcesses(targets);
+                            targets.PrintProcesses();
                             // kill the processes that have a runtime bigger or equal to the maxLifetime variable
-                            MyProcessHelper.KillProcesses(targets, maxLifetime);
+                            targets.KillProcesses(maxLifetime);
 
                             for (int i = 0; i < monitoringFreqMilliseconds / 100; i++)
                             {

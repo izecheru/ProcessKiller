@@ -28,31 +28,31 @@ This is a NUnit test project for **some** of the project functions that I found 
 **MyLogger functions that I tested**
 
 ```csharp
-        /// <summary>
-        /// Writes to the log file
-        /// </summary>
-        /// <param name="message"></param>
-        public static void WriteToLog(string message)
+    /// <summary>
+    /// Writes to the log file
+    /// </summary>
+    /// <param name="message"></param>
+    public static void WriteToLog(string message)
+    {
+        using (StreamWriter sw = new StreamWriter(logFilePath, true))
         {
-            using (StreamWriter sw = new StreamWriter(logFilePath, true))
-            {
-                sw.WriteLine($" {DateTime.Now} - {message} ");
-            }
+            sw.WriteLine($" {DateTime.Now} - {message} ");
         }
+    }
 
-        /// <summary>
-        /// Creates the log file in the directory where the executable is located
-        /// </summary>
-        public static void CreateLogFile()
+    /// <summary>
+    /// Creates the log file in the directory where the executable is located
+    /// </summary>
+    public static void CreateLogFile()
+    {
+        if (!File.Exists(logFilePath))
         {
-            if (!File.Exists(logFilePath))
+            using (StreamWriter sw = new StreamWriter(logFilePath, false))
             {
-                using (StreamWriter sw = new StreamWriter(logFilePath, false))
-                {
-                    ConsolePrinter.PrintInfo($"log file created at: {logFilePath}");
-                }
+                ConsolePrinter.PrintInfo($"log file created at: {logFilePath}");
             }
         }
+    }
 ```
 
 You can find the tests by clicking those links [CreateLogFileTest](https://github.com/izecheru/ProcessKiller/blob/9022b0dce89419d4e1b2814076e1e2e296307e96/QA_Task_Test/MyLoggerTests.cs#L27) and [WriteToLogTest](https://github.com/izecheru/ProcessKiller/blob/9022b0dce89419d4e1b2814076e1e2e296307e96/QA_Task_Test/MyLoggerTests.cs#L34).
@@ -60,23 +60,27 @@ You can find the tests by clicking those links [CreateLogFileTest](https://githu
 **MyProcessHelper functions that I tested**
 
 ```csharp
-        public static int CalculateTimespanInMinutes(Process proc)
+        /// <summary>
+        /// Calculates the total runtime of the program, from the startTime to the current time
+        /// </summary>
+        /// <param name="proc">The target process</param>
+        public static int CalculateTimespanInMinutes(this Process proc)
         {
             TimeSpan procRuntimeTotal = DateTime.Now - proc.StartTime;
             return procRuntimeTotal.Minutes;
         }
 
         /// <summary>
-        /// Kills a process based on the maxLifetime parameter, current time - process start time < maxLifetime
+        /// Kills a process based on the maxLifetime parameter, current time - process start time < maxLifetime 
         /// for the process to live
         /// </summary>
         /// <param name="proc">The target process</param>
         /// <param name="maxLifetime">Amount of minutes a process is allowed to live</param>
-        public static void KillProcess(Process proc, int maxLifetime)
+        public static void KillProcess(this Process proc, int maxLifetime)
         {
             try
             {
-                int runtime = CalculateTimespanInMinutes(proc);
+                int runtime = proc.CalculateTimespanInMinutes();
                 if (runtime >= maxLifetime)
                 {
                     ConsolePrinter.PrintKill($"id:[{proc.Id}] runtime:[{runtime}min]");
@@ -90,12 +94,25 @@ You can find the tests by clicking those links [CreateLogFileTest](https://githu
                 ConsolePrinter.PrintError(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// Wrapper to use foreach to loop through the target processes
+        /// </summary>
+        /// <param name="procs">Target processes</param>
+        /// <param name="maxLifetime">Amount of minutes a process is allowed to live</param>
+        public static void KillProcesses(this Process[] procs, int maxLifetime)
+        {
+            foreach (Process proc in procs)
+            {
+                proc.KillProcess(maxLifetime);
+            }
+        }
 ```
-
-You can find the tests by clicking those links [CalculateTimespanInMinutes](https://github.com/izecheru/ProcessKiller/blob/9022b0dce89419d4e1b2814076e1e2e296307e96/QA_Task_Test/ProcessHelperTests.cs#L15) and [KillProcess](https://github.com/izecheru/ProcessKiller/blob/9022b0dce89419d4e1b2814076e1e2e296307e96/QA_Task_Test/ProcessHelperTests.cs#L38).
-
 Here I chose not to write a test for the array wrapper of kill process because I found it redundant since the kill one process one works fine.
 
 ```csharp
  public static void KillProcesses(Process[] procs, int maxLifetime)
 ```
+
+You can find the tests by clicking those links [CalculateTimespanInMinutes](https://github.com/izecheru/ProcessKiller/blob/9022b0dce89419d4e1b2814076e1e2e296307e96/QA_Task_Test/ProcessHelperTests.cs#L15) and [KillProcess](https://github.com/izecheru/ProcessKiller/blob/9022b0dce89419d4e1b2814076e1e2e296307e96/QA_Task_Test/ProcessHelperTests.cs#L38).
+

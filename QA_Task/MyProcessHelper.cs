@@ -9,7 +9,11 @@ namespace QA_Task
 {
     public static class MyProcessHelper
     {
-        public static int CalculateTimespanInMinutes(Process proc)
+        /// <summary>
+        /// Calculates the total runtime of the program, from the startTime to the current time
+        /// </summary>
+        /// <param name="proc">The target process</param>
+        public static int CalculateTimespanInMinutes(this Process proc)
         {
             TimeSpan procRuntimeTotal = DateTime.Now - proc.StartTime;
             return procRuntimeTotal.Minutes;
@@ -21,11 +25,11 @@ namespace QA_Task
         /// </summary>
         /// <param name="proc">The target process</param>
         /// <param name="maxLifetime">Amount of minutes a process is allowed to live</param>
-        public static void KillProcess(Process proc, int maxLifetime)
+        public static void KillProcess(this Process proc, int maxLifetime)
         {
             try
             {
-                int runtime = CalculateTimespanInMinutes(proc);
+                int runtime = proc.CalculateTimespanInMinutes();
                 if (runtime >= maxLifetime)
                 {
                     ConsolePrinter.PrintKill($"id:[{proc.Id}] runtime:[{runtime}min]");
@@ -45,11 +49,11 @@ namespace QA_Task
         /// </summary>
         /// <param name="procs">Target processes</param>
         /// <param name="maxLifetime">Amount of minutes a process is allowed to live</param>
-        public static void KillProcesses(Process[] procs, int maxLifetime)
+        public static void KillProcesses(this Process[] procs, int maxLifetime)
         {
             foreach (Process proc in procs)
             {
-                KillProcess(proc, maxLifetime);
+                proc.KillProcess(maxLifetime);
             }
         }
 
@@ -57,7 +61,7 @@ namespace QA_Task
         /// Prints the process information to the console
         /// </summary>
         /// <param name="proc"></param>
-        public static void PrintProcessInfo(Process proc)
+        public static void PrintProcessInfo(this Process proc)
         {
             ConsolePrinter.PrintInfo($"id:[{proc.Id}] startTime:[{proc.StartTime}] runtime:[{CalculateTimespanInMinutes(proc)}min]");
         }
@@ -66,11 +70,11 @@ namespace QA_Task
         /// Wrapper for the PrintProcessInfo function to loop through all the processes
         /// </summary>
         /// <param name="procs"></param>
-        public static void PrintProcesses(Process[] procs)
+        public static void PrintProcesses(this Process[] procs)
         {
             foreach (Process process in procs)
             {
-                PrintProcessInfo(process);
+                process.PrintProcessInfo();
             }
         }
     }
