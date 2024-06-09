@@ -4,32 +4,15 @@ namespace QA_Task
 {
     internal class Program
     {
-        static bool quit = false;
-        static int monitoringFreqMilliseconds = 0;
-
         static int ConvertToMilliseconds(int minutes)
         {
             return minutes * 60 * 1000;
         }
 
-        static void ListenForKey()
-        {
-            while (true)
-            {
-                var key = Console.ReadKey(intercept: true);
-                if (key.Key == ConsoleKey.Q)
-                {
-                    ConsolePrinter.PrintMessage("Quitting the program...", ConsolePrinter.MessageType.Info);
-                    quit = true;
-                    break;
-                }
-            }
-        }
-
         static void Main(string[] args)
         {
-            int maxLifetime = 0;
-            int monitoringFreq = 0;
+            int maxLifetime;
+            int monitoringFreq;
             int cicles = 0;
 
             MyLogger.CreateLogFile();
@@ -52,15 +35,15 @@ namespace QA_Task
                     // we start a new thread for the keyboard listener so we 
                     // don't use sleep on this one and risk to not be able to 
                     // send input to the program
-                    Thread quitListener = new Thread(ListenForKey);
+                    Thread quitListener = new Thread(QuitListener.ListenForKey);
                     quitListener.Start();
 
                     ConsolePrinter.PrintMessage("Listening...", ConsolePrinter.MessageType.Info);
-                    monitoringFreqMilliseconds = ConvertToMilliseconds(monitoringFreq);
+                    QuitListener.monitoringFreqMilliseconds = ConvertToMilliseconds(monitoringFreq);
                     string targetProc = args[0].ToLower();
 
                     // run as long as we dont press q
-                    while (!quit)
+                    while (!QuitListener.quit)
                     {
                         ConsolePrinter.PrintMessage($"checking for running processes with name: {targetProc}", ConsolePrinter.MessageType.Info);
                         Process[] targets = Process.GetProcessesByName(targetProc);
@@ -70,12 +53,10 @@ namespace QA_Task
                         // kill the processes that have a runtime bigger or equal to the maxLifetime variable
                         targets.KillProcessesThatExceedsLifetime(maxLifetime);
 
-                        for (int i = 0; i < monitoringFreqMilliseconds / 100; i++)
-                        {
-                            if (quit)
-                                break;
-                            Thread.Sleep(100);
-                        }
+                        // just sleep the main thread
+                        // the loop was dependant on quit variable and the monitoringFreqMilliseconds
+                        // which both are part of the quit listener so i've put them in a function
+                        QuitListener.SleepTheMainThread();
 
                         // a variable to know how many cycles of checking for a process we've been through
                         // not used at the moment, added for debugging purposes
