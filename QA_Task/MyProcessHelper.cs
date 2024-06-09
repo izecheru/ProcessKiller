@@ -32,7 +32,7 @@ namespace QA_Task
                 int runtime = proc.CalculateTimespanInMinutes();
                 if (runtime >= maxLifetime)
                 {
-                    ConsolePrinter.PrintKill($"id:[{proc.Id}] runtime:[{runtime}min]");
+                    ConsolePrinter.PrintMessage($"id:[{proc.Id}] runtime:[{runtime}min]", ConsolePrinter.MessageType.Kill);
                     // we write the kill to log
                     MyLogger.WriteToLog($"[killed] processName:[{proc.ProcessName}] id:[{proc.Id}] startTime:[{proc.StartTime}] runtime:[{runtime}min]");
                     proc.Kill();
@@ -40,7 +40,7 @@ namespace QA_Task
             }
             catch (Exception ex)
             {
-                ConsolePrinter.PrintError(ex.ToString());
+                ConsolePrinter.PrintMessage(ex.ToString(), ConsolePrinter.MessageType.Error);
             }
         }
 
@@ -49,7 +49,7 @@ namespace QA_Task
         /// </summary>
         /// <param name="procs">Target processes</param>
         /// <param name="maxLifetime">Amount of minutes a process is allowed to live</param>
-        public static void KillProcesses(this Process[] procs, int maxLifetime)
+        public static void KillProcessesThatExceedsLifetime(this Process[] procs, int maxLifetime)
         {
             foreach (Process proc in procs)
             {
@@ -63,7 +63,7 @@ namespace QA_Task
         /// <param name="proc"></param>
         public static void PrintProcessInfo(this Process proc)
         {
-            ConsolePrinter.PrintInfo($"id:[{proc.Id}] startTime:[{proc.StartTime}] runtime:[{CalculateTimespanInMinutes(proc)}min]");
+            ConsolePrinter.PrintMessage($"id:[{proc.Id}] startTime:[{proc.StartTime}] runtime:[{CalculateTimespanInMinutes(proc)}min]", ConsolePrinter.MessageType.Info);
         }
 
         /// <summary>

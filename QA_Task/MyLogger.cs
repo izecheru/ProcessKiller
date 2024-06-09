@@ -32,7 +32,7 @@ namespace QA_Task
             {
                 using (StreamWriter sw = new StreamWriter(logFilePath, false))
                 {
-                    ConsolePrinter.PrintInfo($"log file created at: {logFilePath}");
+                    ConsolePrinter.PrintMessage($"log file created at: {logFilePath}", ConsolePrinter.MessageType.Info);
                 }
             }
         }

@@ -19,7 +19,7 @@ namespace QA_Task
                 var key = Console.ReadKey(intercept: true);
                 if (key.Key == ConsoleKey.Q)
                 {
-                    ConsolePrinter.PrintError("Quitting the program...");
+                    ConsolePrinter.PrintMessage("Quitting the program...", ConsolePrinter.MessageType.Info);
                     quit = true;
                     break;
                 }
@@ -34,18 +34,18 @@ namespace QA_Task
 
             MyLogger.CreateLogFile();
 
-            if(args.Length==3)
+            if (args.Length == 3)
             {
                 try
                 {
                     if (!int.TryParse(args[1], out maxLifetime))
                     {
-                        ConsolePrinter.PrintError($"[{args[1]}] wrong format");
+                        ConsolePrinter.PrintMessage($"[{args[1]}] wrong format", ConsolePrinter.MessageType.Error);
                         Environment.Exit(1);
                     }
                     if (!int.TryParse(args[2], out monitoringFreq))
                     {
-                        ConsolePrinter.PrintError($"[{args[2]}] wrong format");
+                        ConsolePrinter.PrintMessage($"[{args[2]}] wrong format", ConsolePrinter.MessageType.Error);
                         Environment.Exit(1);
                     }
 
@@ -55,20 +55,20 @@ namespace QA_Task
                     Thread quitListener = new Thread(ListenForKey);
                     quitListener.Start();
 
-                    ConsolePrinter.PrintInfo("Listening...");
+                    ConsolePrinter.PrintMessage("Listening...", ConsolePrinter.MessageType.Info);
                     monitoringFreqMilliseconds = ConvertToMilliseconds(monitoringFreq);
                     string targetProc = args[0].ToLower();
 
                     // run as long as we dont press q
                     while (!quit)
                     {
-                        ConsolePrinter.PrintInfo($"checking for running processes with name: {targetProc}");
+                        ConsolePrinter.PrintMessage($"checking for running processes with name: {targetProc}", ConsolePrinter.MessageType.Info);
                         Process[] targets = Process.GetProcessesByName(targetProc);
 
                         // print found processes 
                         targets.PrintProcesses();
                         // kill the processes that have a runtime bigger or equal to the maxLifetime variable
-                        targets.KillProcesses(maxLifetime);
+                        targets.KillProcessesThatExceedsLifetime(maxLifetime);
 
                         for (int i = 0; i < monitoringFreqMilliseconds / 100; i++)
                         {

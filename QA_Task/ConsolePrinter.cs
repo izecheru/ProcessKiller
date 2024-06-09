@@ -9,37 +9,46 @@ namespace QA_Task
     public static class ConsolePrinter
     {
 
+        public enum MessageType
+        {
+            Info,
+            Kill,
+            Error
+        }
+
         /// <summary>
         /// Printing info to the console
         /// </summary>
         /// <param name="message"></param>
-        public static void PrintInfo(string message)
+        public static void PrintMessage(string message, MessageType type)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($" {DateTime.Now} [inf] {message}");
-            Console.ResetColor();
-        }
+            switch (type)
+            {
+                case MessageType.Info:
+                    {
 
-        /// <summary>
-        /// Printing errors to the console
-        /// </summary>
-        /// <param name="message"></param>
-        public static void PrintError(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($" {DateTime.Now} [err] {message}");
-            Console.ResetColor();
-        }
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($" {DateTime.Now} [inf] {message}");
+                        Console.ResetColor();
+                        break;
+                    }
 
-        /// <summary>
-        /// Printing process kills to the console
-        /// </summary>
-        /// <param name="message"></param>
-        public static void PrintKill(string message)
-        {
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($" {DateTime.Now} [killed] {message}");
-            Console.ResetColor();
+                case MessageType.Kill:
+                    {
+
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($" {DateTime.Now} [kill] {message}");
+                        Console.ResetColor();
+                        break;
+                    }
+                case MessageType.Error:
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine($" {DateTime.Now} [err] {message}");
+                        Console.ResetColor();
+                        break;
+                    }
+            }
         }
     }
 }
